@@ -7,7 +7,8 @@ import { parseCSV, normalizeHeaders, detectFileType, fetchSampleCSV } from '../l
 import { scoreAccount } from '../lib/scoring';
 import { useApp } from '../context/AppContext';
 import StripeConnect from '../components/upload/StripeConnect';
-import CanvasBackground from '../components/ui/CanvasBackground';
+import dynamic from 'next/dynamic';
+const CanvasBackground = dynamic(() => import('../components/ui/CanvasBackground'), { ssr: false });
 
 const TYPE_LABELS = {
   customers: 'Customers',

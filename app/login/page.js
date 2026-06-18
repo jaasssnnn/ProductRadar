@@ -1,8 +1,10 @@
 'use client';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import dynamic from 'next/dynamic';
 import { createClient } from '@/src/lib/supabase/client';
-import CanvasBackground from '@/src/components/ui/CanvasBackground';
+
+const CanvasBackground = dynamic(() => import('@/src/components/ui/CanvasBackground'), { ssr: false });
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
