@@ -32,7 +32,7 @@ export default function LoginPage() {
           <div className="-space-y-5">
             <img src="/logo.png" alt="ChurnRadar" className="w-56 h-56 mx-auto" />
             <div className="space-y-2">
-              <h1 className="text-[2rem] font-bold leading-[1.1] tracking-tight text-white whitespace-nowrap">Welcome to <span style={{ color: '#4070E0' }}>ChurnRadar</span></h1>
+              <h1 className="text-[2rem] font-bold leading-[1.1] tracking-tight text-white whitespace-nowrap">Welcome to <span style={{ color: '#6B93F0' }}>ChurnRadar</span></h1>
               <p className="text-xl text-white/50 font-light">Sign in to your account</p>
             </div>
           </div>
