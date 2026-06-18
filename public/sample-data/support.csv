@@ -1,0 +1,13 @@
+customer_id,ticket_count,unresolved_tickets,sentiment_tag,last_ticket_date
+C001,2,1,neutral,2026-05-20
+C002,5,4,negative,2026-05-28
+C003,1,0,positive,2026-04-01
+C004,1,0,neutral,2026-04-10
+C005,7,5,negative,2026-05-15
+C006,3,2,negative,2026-05-18
+C007,0,0,positive,
+C008,2,1,neutral,2026-05-22
+C009,4,3,negative,2026-05-25
+C010,1,0,positive,2026-05-10
+C011,6,4,negative,2026-05-20
+C012,3,2,negative,2026-05-12

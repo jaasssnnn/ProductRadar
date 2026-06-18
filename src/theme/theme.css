@@ -1,0 +1,56 @@
+/* ============================================================
+   AETHER Theme Tokens — CSS custom properties
+   Extracted from the reference dashboard screenshot.
+   Mirror of tailwind.config.js + theme/tokens.json
+   ============================================================ */
+:root {
+  /* Surfaces */
+  --bg:              #F4F3F5;
+  --surface:         #FFFFFF;
+  --surface-muted:   #FAFAFB;
+
+  /* Ink / text */
+  --ink:             #15151A;
+  --ink-soft:        #4A4A52;
+  --ink-mute:        #9A9AA2;
+  --hairline:        #ECEBEF;
+  --row-hover:       #F7F6F9;
+
+  /* KPI card gradients */
+  --kpi-cream-start: #FBF4DC;  --kpi-cream-end: #FAEFC6;
+  --kpi-blue-start:  #E8EFFC;  --kpi-blue-end:  #D8E5FB;
+  --kpi-lav-start:   #F0EAFB;  --kpi-lav-end:   #E6DBF7;
+  --kpi-rose-start:  #FBE7EF;  --kpi-rose-end:  #F6D9E6;
+  --kpi-text:        #15151A;  /* value */
+  --kpi-subtext:     #4A4A52;  /* label */
+
+  /* Arrow button */
+  --arrow-bg:        #15151A;
+  --arrow-bg-hover:  #2A2A30;
+  --arrow-fg:        #FFFFFF;
+
+  /* Chart */
+  --bar:             #8E7CF0;
+  --bar-soft:        #C9C0F5;
+  --chart-grid:      #ECEBEF;
+  --chart-axis:      #9A9AA2;
+  --accent:          #4070E0;   /* CTA blue */
+
+  /* Table */
+  --table-header-bg: #FAFAFB;
+  --table-header-fg: #9A9AA2;
+  --row-bg:          #FFFFFF;
+  --divider:         #EFEEF1;
+
+  /* Status colors */
+  --status-success-fg: #16A36B;  --status-success-bg: #E4F6EE;
+  --status-warning-fg: #C98A1E;  --status-warning-bg: #FBF1DE;
+  --status-fail-fg:    #E5484D;  --status-fail-bg:    #FCEAEA;
+  --status-critical-fg:#B00020;  --status-critical-bg:#FBE3E6;
+
+  /* Radius / shadow */
+  --radius-card: 24px;
+  --radius-chip: 999px;
+  --shadow-card: 0 1px 2px rgba(20,20,30,0.04), 0 8px 24px rgba(20,20,30,0.05);
+  --shadow-arrow: 0 4px 12px rgba(20,20,30,0.18);
+}

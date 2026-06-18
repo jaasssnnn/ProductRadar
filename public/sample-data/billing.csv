@@ -1,0 +1,13 @@
+customer_id,invoice_status,last_payment_date,failed_payments,subscription_status
+C001,paid,2026-05-01,0,active
+C002,overdue,2026-03-01,2,past_due
+C003,paid,2026-06-01,0,active
+C004,paid,2026-05-01,0,active
+C005,failed,2026-02-01,3,past_due
+C006,paid,2026-05-01,1,active
+C007,paid,2026-06-01,0,active
+C008,paid,2026-05-01,0,active
+C009,overdue,2026-04-01,1,past_due
+C010,paid,2026-06-01,0,active
+C011,failed,2026-03-01,2,past_due
+C012,paid,2026-05-01,0,active

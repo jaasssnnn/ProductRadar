@@ -1,0 +1,13 @@
+customer_id,account_name,plan,signup_date,mrr,renewal_date,status
+C001,Acme Corp,Pro,2023-03-15,499,2026-07-15,active
+C002,BlueWave Inc,Starter,2023-08-01,99,2026-06-20,active
+C003,Orbit Systems,Enterprise,2022-11-10,1499,2026-06-30,active
+C004,Tandem Tools,Pro,2024-01-05,499,2026-08-05,active
+C005,Frostline SaaS,Starter,2024-05-20,99,2026-09-20,active
+C006,Nomadic Labs,Pro,2023-06-01,499,2026-07-01,active
+C007,Zenith Analytics,Enterprise,2022-07-15,1499,2026-06-18,active
+C008,Pixel Forge,Starter,2024-02-28,99,2026-08-28,active
+C009,Cascade CRM,Pro,2023-09-12,499,2026-07-12,active
+C010,Ironclad Data,Enterprise,2023-01-20,1499,2026-06-25,active
+C011,Drift Ops,Starter,2024-04-01,99,2026-10-01,active
+C012,Harbor Health,Pro,2023-07-08,499,2026-07-08,active

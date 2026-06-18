@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+@import './theme/theme.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-canvas text-ink antialiased;
+  font-family: 'Plus Jakarta Sans', Inter, system-ui, sans-serif;
+}
+
+/* Diagonal hatch pattern used for alternating bar fills (matches reference) */
+.bar-hatch {
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--bar-soft) 0,
+    var(--bar-soft) 2px,
+    transparent 2px,
+    transparent 6px
+  );
+}
