@@ -38,7 +38,7 @@ function initCentroids(vectors, k) {
   return centers;
 }
 
-function nameCluster(centroid, memberCount) {
+function nameCluster(centroid) {
   const dominant = FACTOR_KEYS.filter((_, i) => centroid[i] > 0.5);
 
   if (dominant.length === 0) return {
@@ -99,7 +99,7 @@ export function clusterAccounts(accounts, k) {
     const members = accounts.filter((_, j) => assignments[j] === i);
     if (!members.length) return null;
     const avgScore = Math.round(members.reduce((s, a) => s + a.score, 0) / members.length);
-    const { name, description } = nameCluster(centroids[i], members.length);
+    const { name, description } = nameCluster(centroids[i]);
     return {
       id: i,
       name,

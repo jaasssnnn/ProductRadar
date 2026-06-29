@@ -1,7 +1,7 @@
 'use client';
 import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { createClient } from '../lib/supabase/client';
-import { computeLearnedWeights, BASE_WEIGHTS } from '../lib/scoring';
+import { computeLearnedWeights } from '../lib/scoring';
 import { clusterAccounts } from '../lib/clustering';
 
 const AppContext = createContext(null);
