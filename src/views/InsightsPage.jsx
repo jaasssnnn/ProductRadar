@@ -1,19 +1,22 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2, Sparkles } from 'lucide-react';
+import { Loader2, Sparkles, GitBranch, Zap } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import InsightCard from '../components/insights/InsightCard';
 import SegmentChart from '../components/insights/SegmentChart';
 import { getInsightsSummary } from '../lib/claudeApi';
+import { BASE_WEIGHTS } from '../lib/scoring';
+import { FACTOR_SHORT } from '../lib/clustering';
+import { getRiskLabel } from '../lib/scoring';
 
 const FACTOR_LABELS = {
-  inactivity:    'No recent activity',
-  usage_decline: 'Usage drop',
-  billing:       'Billing issue',
-  support:       'Support friction',
-  renewal_risk:  'Renewal at risk',
-  low_adoption:  'Low feature adoption',
+  inactivity:    'Inactivity',
+  usage_decline: 'Usage Decline',
+  billing:       'Billing Issue',
+  support:       'Support Friction',
+  renewal_risk:  'Renewal Risk',
+  low_adoption:  'Low Adoption',
 };
 
 const STAT_GRADIENTS = [
@@ -23,6 +26,7 @@ const STAT_GRADIENTS = [
 ];
 
 const BAND_ORDER = ['Critical', 'High', 'Medium', 'Low'];
+const RISK_COLORS = { Critical: '#E5484D', High: '#EA7A19', Medium: '#C98A1E', Low: '#16A36B' };
 
 function outcomeAnalytics(scoredAccounts, accountStatuses, outcomes) {
   const resolvedIds = Object.entries(accountStatuses)
@@ -51,16 +55,57 @@ function outcomeAnalytics(scoredAccounts, accountStatuses, outcomes) {
   return { counts, total, byBand, resolvedCount: resolvedIds.length };
 }
 
+function ClusterCard({ cluster }) {
+  const color = RISK_COLORS[getRiskLabel(cluster.avgScore)] || '#555';
+  return (
+    <div className="bg-[#1c1c1e] border border-white/[0.08] rounded-card p-5 flex flex-col gap-3">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-sm font-bold text-white leading-snug">{cluster.name}</p>
+          <p className="text-xs text-white/40 font-medium mt-0.5 leading-snug">{cluster.description}</p>
+        </div>
+        <div className="text-right flex-shrink-0">
+          <p className="text-2xl font-bold tabular-nums leading-none" style={{ color }}>{cluster.avgScore}</p>
+          <p className="text-xs text-white/25 font-medium mt-0.5">avg score</p>
+        </div>
+      </div>
+
+      {cluster.dominantFactors.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {cluster.dominantFactors.map(f => (
+            <span key={f} className="text-xs font-bold px-2 py-0.5 rounded-full bg-white/8 text-white/50">
+              {FACTOR_SHORT[f]}
+            </span>
+          ))}
+        </div>
+      )}
+
+      <div>
+        <p className="text-xs text-white/25 font-medium mb-1.5">
+          {cluster.members.length} account{cluster.members.length !== 1 ? 's' : ''}
+        </p>
+        <div className="space-y-0.5">
+          {cluster.members.slice(0, 5).map(a => (
+            <p key={a.customer_id} className="text-xs text-white/35 font-medium truncate">· {a.account_name}</p>
+          ))}
+          {cluster.members.length > 5 && (
+            <p className="text-xs text-white/20 font-medium">+{cluster.members.length - 5} more</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function InsightsPage() {
-  const { scoredAccounts, dataLoaded, accountStatuses, outcomes } = useApp();
+  const { scoredAccounts, dataLoaded, accountStatuses, outcomes, clusters, learnedWeights, learnedWeightsMeta } = useApp();
   const router = useRouter();
   const [insights, setInsights] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError]     = useState(null);
 
   async function loadInsights() {
-    setLoading(true);
-    setError(null);
+    setLoading(true); setError(null);
     try { setInsights(await getInsightsSummary(scoredAccounts)); }
     catch (e) { setError('Failed to load AI insights.'); }
     finally { setLoading(false); }
@@ -111,6 +156,9 @@ export default function InsightsPage() {
   const oa = outcomeAnalytics(scoredAccounts, accountStatuses, outcomes);
   const saveRate = oa.total > 0 ? Math.round((oa.counts.Saved / oa.total) * 100) : null;
 
+  const isLearned   = learnedWeightsMeta?.isLearned;
+  const sampleSize  = learnedWeightsMeta?.sampleSize ?? 0;
+
   return (
     <div className="min-h-full bg-black p-8 space-y-6">
       <div className="mb-2">
@@ -118,7 +166,7 @@ export default function InsightsPage() {
         <p className="text-sm text-white/40 font-medium mt-1">AI-powered patterns across your accounts</p>
       </div>
 
-      {/* Stat cards — gradient like KPI cards */}
+      {/* Stat cards */}
       <div className="grid grid-cols-3 gap-4">
         {stats.map(({ label, value, small }, i) => (
           <div key={label} className={`rounded-3xl p-6 flex flex-col justify-between min-h-[140px] shadow-sm border border-black/5 ${STAT_GRADIENTS[i]}`}>
@@ -128,7 +176,94 @@ export default function InsightsPage() {
         ))}
       </div>
 
-      {/* Intervention Outcomes — only shown once any account has a recorded outcome */}
+      {/* Risk Profiles — K-Means Clusters */}
+      {clusters.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <GitBranch size={13} className="text-white/40" />
+            <p className="text-xs font-bold uppercase tracking-widest text-white/40">Risk Profiles</p>
+            <span className="text-xs text-white/20 font-medium ml-1">
+              {clusters.length} segments · {scoredAccounts.length} accounts · k-means clustering
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            {clusters.map(cluster => (
+              <ClusterCard key={cluster.id} cluster={cluster} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Scoring Intelligence — Learned Weights */}
+      <div className="bg-[#1c1c1e] border border-white/[0.08] rounded-card p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Zap size={13} className={isLearned ? 'text-green-400' : 'text-white/30'} />
+            <p className="text-xs font-bold uppercase tracking-widest text-white/40">Scoring Intelligence</p>
+          </div>
+          {isLearned ? (
+            <span className="text-xs bg-green-500/15 text-green-400 font-bold px-2.5 py-1 rounded-full">
+              Active · {sampleSize} outcomes
+            </span>
+          ) : (
+            <span className="text-xs bg-white/5 text-white/30 font-bold px-2.5 py-1 rounded-full">
+              Needs {Math.max(0, 5 - sampleSize)} more outcome{5 - sampleSize !== 1 ? 's' : ''} to activate
+            </span>
+          )}
+        </div>
+
+        <p className="text-xs text-white/40 font-medium mb-5 leading-relaxed">
+          {isLearned
+            ? `Factor weights have been adjusted based on ${sampleSize} recorded intervention outcomes. Factors that reliably predicted churn in your account base are weighted higher; factors that appeared in saved accounts are weighted lower.`
+            : 'Record Saved / Churned / Expanded outcomes on resolved accounts. Once 5 outcomes are logged, ChurnRadar will calibrate factor weights against your actual churn data instead of industry defaults.'
+          }
+        </p>
+
+        <div className="space-y-3">
+          {Object.entries(BASE_WEIGHTS).map(([key, base]) => {
+            const learned = learnedWeights?.[key] ?? base;
+            const delta   = learned - base;
+            const maxW    = Math.max(...Object.values(learnedWeights ?? BASE_WEIGHTS), ...Object.values(BASE_WEIGHTS));
+            return (
+              <div key={key} className="flex items-center gap-3">
+                <span className="text-xs text-white/50 font-medium w-32 flex-shrink-0">{FACTOR_LABELS[key]}</span>
+                <div className="flex-1 space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-white/20 w-6 tabular-nums text-right">{base}</span>
+                    <div className="flex-1 h-1.5 bg-white/8 rounded-full overflow-hidden">
+                      <div className="h-full bg-white/25 rounded-full transition-all" style={{ width: `${(base / maxW) * 100}%` }} />
+                    </div>
+                    <span className="text-xs text-white/20 w-10">base</span>
+                  </div>
+                  {isLearned && (
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs w-6 tabular-nums text-right font-bold ${
+                        delta > 0 ? 'text-red-400' : delta < 0 ? 'text-green-400' : 'text-white/20'
+                      }`}>{learned}</span>
+                      <div className="flex-1 h-1.5 bg-white/8 rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all"
+                          style={{
+                            width: `${(learned / maxW) * 100}%`,
+                            background: delta > 0 ? '#E5484D' : delta < 0 ? '#16A36B' : 'rgba(255,255,255,0.25)',
+                          }}
+                        />
+                      </div>
+                      <span className={`text-xs font-bold w-10 ${
+                        delta > 0 ? 'text-red-400' : delta < 0 ? 'text-green-400' : 'text-white/20'
+                      }`}>
+                        {delta > 0 ? `+${delta}` : delta < 0 ? `${delta}` : '—'}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Intervention Outcomes */}
       {oa.total > 0 && (
         <div className="bg-[#1c1c1e] border border-white/[0.08] rounded-card p-6 space-y-5">
           <div className="flex items-center justify-between">

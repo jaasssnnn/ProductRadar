@@ -18,7 +18,7 @@ const TYPE_LABELS = {
   unknown:   'Unknown',
 };
 
-function runScoring(accountRows, activity, billing, support) {
+function runScoring(accountRows, activity, billing, support, weights) {
   const presence = {
     activity: activity.length > 0,
     billing:  billing.length > 0,
@@ -34,6 +34,7 @@ function runScoring(accountRows, activity, billing, support) {
       billingMap[customer.customer_id] || null,
       supportMap[customer.customer_id] || null,
       presence,
+      weights,
     ),
   }));
 }
@@ -42,7 +43,7 @@ export default function UploadPage() {
   const router = useRouter();
   const {
     customers: ctxCustomers, activity: ctxActivity, billing: ctxBilling, support: ctxSupport,
-    dataLoaded,
+    dataLoaded, learnedWeights,
     setCustomers, setActivity, setBilling, setSupport, setScoredAccounts, setDataLoaded,
   } = useApp();
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -104,7 +105,7 @@ export default function UploadPage() {
         const mergedActivity = activityFile.length > 0 ? activityFile : ctxActivity;
         const mergedSupport  = supportFile.length  > 0 ? supportFile  : ctxSupport;
         const mergedBilling  = billingFile.length  > 0 ? billingFile  : ctxBilling;
-        const scored = runScoring(ctxCustomers, mergedActivity, mergedBilling, mergedSupport);
+        const scored = runScoring(ctxCustomers, mergedActivity, mergedBilling, mergedSupport, learnedWeights);
         setActivity(mergedActivity); setBilling(mergedBilling); setSupport(mergedSupport);
         setScoredAccounts(scored); setDataLoaded(true);
         router.push('/dashboard');
@@ -114,7 +115,7 @@ export default function UploadPage() {
       const accountRows = customersFile.length > 0 ? customersFile : uploadedFiles[0]?.rows || [];
       if (accountRows.length === 0) { setError('No account data found.'); return; }
 
-      const scored = runScoring(accountRows, activityFile, billingFile, supportFile);
+      const scored = runScoring(accountRows, activityFile, billingFile, supportFile, learnedWeights);
       setCustomers(accountRows); setActivity(activityFile); setBilling(billingFile); setSupport(supportFile);
       setScoredAccounts(scored); setDataLoaded(true);
       router.push('/dashboard');
@@ -127,7 +128,7 @@ export default function UploadPage() {
     try {
       const { customers: stripeCustomers, billing: stripeBilling } = stripeData;
       const get = type => uploadedFiles.find(f => f.type === type)?.rows || [];
-      const scored = runScoring(stripeCustomers, get('activity'), stripeBilling, get('support'));
+      const scored = runScoring(stripeCustomers, get('activity'), stripeBilling, get('support'), learnedWeights);
       setCustomers(stripeCustomers); setActivity(get('activity'));
       setBilling(stripeBilling);     setSupport(get('support'));
       setScoredAccounts(scored);     setDataLoaded(true);

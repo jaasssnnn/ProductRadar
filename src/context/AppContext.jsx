@@ -1,6 +1,8 @@
 'use client';
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { createClient } from '../lib/supabase/client';
+import { computeLearnedWeights, BASE_WEIGHTS } from '../lib/scoring';
+import { clusterAccounts } from '../lib/clustering';
 
 const AppContext = createContext(null);
 
@@ -169,6 +171,17 @@ export function AppProvider({ children }) {
     lsSet('cr_last_synced', ts);
   }
 
+  const learnedWeightResult = useMemo(
+    () => computeLearnedWeights(scoredAccounts, accountStatuses, outcomes),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [scoredAccounts, accountStatuses, outcomes]
+  );
+
+  const clusters = useMemo(
+    () => scoredAccounts.length >= 2 ? clusterAccounts(scoredAccounts).clusters : [],
+    [scoredAccounts]
+  );
+
   const loadedDataTypes = [
     customers.length > 0 ? 'customers' : null,
     activity.length  > 0 ? 'activity'  : null,
@@ -235,6 +248,12 @@ export function AppProvider({ children }) {
       accountChanges,
       changedAccounts,
       escalatedCount,
+      learnedWeights: learnedWeightResult.weights,
+      learnedWeightsMeta: {
+        sampleSize: learnedWeightResult.sampleSize,
+        isLearned:  learnedWeightResult.isLearned,
+      },
+      clusters,
     }}>
       {children}
     </AppContext.Provider>
