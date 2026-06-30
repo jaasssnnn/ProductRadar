@@ -30,9 +30,9 @@ export default function LoginPage() {
           className="w-full max-w-sm text-center space-y-8"
         >
           <div className="-space-y-5">
-            <img src="/logo.png" alt="ChurnRadar" className="w-56 h-56 mx-auto" />
+            <img src="/logo.png" alt="ProductRadar" className="w-56 h-56 mx-auto" />
             <div className="space-y-2">
-              <h1 className="text-[2rem] font-bold leading-[1.1] tracking-tight text-white whitespace-nowrap">Welcome to <span style={{ color: '#6B93F0' }}>ChurnRadar</span></h1>
+              <h1 className="text-[2rem] font-bold leading-[1.1] tracking-tight text-white whitespace-nowrap">Welcome to <span style={{ color: '#6B93F0' }}>ProductRadar</span></h1>
               <p className="text-xl text-white/50 font-light">Sign in to your account</p>
             </div>
           </div>

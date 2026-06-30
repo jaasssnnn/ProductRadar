@@ -15,7 +15,7 @@ export async function GET(request) {
 
   // Validate CSRF state
   const cookieStore = await cookies();
-  const savedState  = cookieStore.get('churnradar_oauth_state')?.value;
+  const savedState  = cookieStore.get('productradar_oauth_state')?.value;
   if (!savedState || savedState !== state) {
     return NextResponse.redirect(`${BASE_URL}/upload?stripe=error&reason=state_mismatch`);
   }
@@ -47,7 +47,7 @@ export async function GET(request) {
       { onConflict: 'user_id' }
     );
 
-    cookieStore.delete('churnradar_oauth_state');
+    cookieStore.delete('productradar_oauth_state');
     return NextResponse.redirect(`${BASE_URL}/upload?stripe=connected`);
   } catch (err) {
     console.error('Stripe OAuth callback error:', err.message);

@@ -1,4 +1,4 @@
-// ─── ChurnRadar — Stripe test-data seeder ────────────────────────────────────
+// ─── ProductRadar — Stripe test-data seeder ────────────────────────────────────
 //
 // Fills a Stripe TEST account with fake-but-realistic customers, subscriptions,
 // and a failed-renewal scenario, then writes companion activity/support CSVs
@@ -18,7 +18,7 @@
 //   Cirrus Retail   mixed           — pays fine; mild activity decline lands it Medium
 //
 // The activity/support CSV timestamps are relative to TODAY (real time), because
-// ChurnRadar scores activity against `new Date()`. The Stripe Test Clock only
+// ProductRadar scores activity against `new Date()`. The Stripe Test Clock only
 // drives the billing simulation; the two timelines are independent by design.
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -29,8 +29,8 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_DIR = join(__dirname, '..', 'seed-output');
-const CLOCK_NAME = 'churnradar-seed';
-const SEED_TAG = 'churnradar-seed';
+const CLOCK_NAME = 'productradar-seed';
+const SEED_TAG = 'productradar-seed';
 
 // ── Load .env file (so you don't need to export the key in your shell) ───────
 const envPath = join(__dirname, '..', '.env');
@@ -84,7 +84,7 @@ const nowUnix = () => Math.floor(Date.now() / 1000);
 const daysAgo = n => new Date(Date.now() - n * 86400000).toISOString().split('T')[0];
 const sleep   = ms => new Promise(r => setTimeout(r, ms));
 
-// ── Cleanup: delete any test clock named churnradar-seed (cascades to customers) ─
+// ── Cleanup: delete any test clock named productradar-seed (cascades to customers) ─
 async function cleanup() {
   console.log('Cleaning up previous seed data…');
   let deleted = 0;
@@ -110,7 +110,7 @@ async function waitForClock(clockId) {
 }
 
 async function seed() {
-  console.log('Seeding ChurnRadar demo data into Stripe TEST mode…\n');
+  console.log('Seeding ProductRadar demo data into Stripe TEST mode…\n');
 
   // 1. Test clock — anchors every customer to a controllable timeline
   const clock = await stripe.testHelpers.testClocks.create({
@@ -121,7 +121,7 @@ async function seed() {
 
   // 2. One product, one price per account
   const product = await stripe.products.create({
-    name: 'ChurnRadar Demo Plan',
+    name: 'ProductRadar Demo Plan',
     metadata: { seeded_by: SEED_TAG },
   });
 

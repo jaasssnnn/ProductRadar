@@ -149,8 +149,8 @@ export default function UploadPage() {
       >
         {/* Logo */}
         <div className="flex items-center justify-center gap-3 mb-8">
-          <img src="/logo.png" alt="ChurnRadar" className="w-10 h-10" />
-          <span className="text-white font-bold text-lg tracking-tight">ChurnRadar</span>
+          <img src="/logo.png" alt="ProductRadar" className="w-10 h-10" />
+          <span className="text-white font-bold text-lg tracking-tight">ProductRadar</span>
         </div>
 
         {/* Card */}

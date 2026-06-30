@@ -215,7 +215,7 @@ export default function InsightsPage() {
         <p className="text-xs text-white/40 font-medium mb-5 leading-relaxed">
           {isLearned
             ? `Factor weights have been adjusted based on ${sampleSize} recorded intervention outcomes. Factors that reliably predicted churn in your account base are weighted higher; factors that appeared in saved accounts are weighted lower.`
-            : 'Record Saved / Churned / Expanded outcomes on resolved accounts. Once 5 outcomes are logged, ChurnRadar will calibrate factor weights against your actual churn data instead of industry defaults.'
+            : 'Record Saved / Churned / Expanded outcomes on resolved accounts. Once 5 outcomes are logged, ProductRadar will calibrate factor weights against your actual churn data instead of industry defaults.'
           }
         </p>
 

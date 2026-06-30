@@ -34,7 +34,7 @@ const MOCK_RECOMMENDATION = {
   outreachEmail:
     'Subject: Quick check-in — let\'s make sure you\'re getting value\n\nHi [Name],\n\nI noticed it\'s been a while since your team has been active in the platform. I wanted to reach out personally to make sure everything is going smoothly and that you\'re getting the most out of your subscription.\n\nWould you have 20 minutes this week for a quick call? I\'d love to show you a few features that teams like yours have found really valuable.\n\nLet me know what works for you.\n\nBest,\n[Account Manager]',
   outreachWhatsApp:
-    'Hi [Name], this is [AM] from ChurnRadar. I noticed your team hasn\'t logged in recently and wanted to check in. Are you running into any issues? Happy to jump on a quick call this week to help.',
+    'Hi [Name], this is [AM] from ProductRadar. I noticed your team hasn\'t logged in recently and wanted to check in. Are you running into any issues? Happy to jump on a quick call this week to help.',
 };
 
 const MOCK_INSIGHTS = [

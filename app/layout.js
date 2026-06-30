@@ -2,8 +2,8 @@ import './globals.css';
 import Providers from './providers';
 
 export const metadata = {
-  title: 'ChurnRadar',
-  description: 'B2B SaaS churn risk detection',
+  title: 'ProductRadar',
+  description: 'B2B SaaS product analytics & churn risk detection',
 };
 
 export default function RootLayout({ children }) {

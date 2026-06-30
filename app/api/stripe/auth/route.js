@@ -8,7 +8,7 @@ import crypto from 'crypto';
 const CLIENT_ID = process.env.STRIPE_CONNECT_CLIENT_ID;
 
 // TODO: Set NEXT_PUBLIC_BASE_URL in your Vercel environment variables.
-// Example: https://churnradar.vercel.app (no trailing slash)
+// Example: https://productradar.vercel.app (no trailing slash)
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
 export async function GET() {
@@ -23,7 +23,7 @@ export async function GET() {
   const state = crypto.randomBytes(16).toString('hex');
 
   const cookieStore = await cookies();
-  cookieStore.set('churnradar_oauth_state', state, {
+  cookieStore.set('productradar_oauth_state', state, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     maxAge: 600, // 10 minutes — enough time to complete OAuth

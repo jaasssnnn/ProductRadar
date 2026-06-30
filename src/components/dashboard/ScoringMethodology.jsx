@@ -82,7 +82,7 @@ export default function ScoringMethodology() {
         <div className="border-t border-white/[0.08] px-6 pb-6 pt-5 space-y-6">
 
           <p className="text-sm text-white/50 font-medium leading-relaxed max-w-3xl">
-            ChurnRadar uses a <span className="text-white font-semibold">heuristic scoring engine</span> — no black box.
+            ProductRadar uses a <span className="text-white font-semibold">heuristic scoring engine</span> — no black box.
             Every account score is the direct sum of the factors below.
             {isLearned
               ? <> Weights have been <span className="text-green-400 font-semibold">calibrated from {learnedWeightsMeta.sampleSize} recorded intervention outcomes</span> in your account base.</>
@@ -155,7 +155,7 @@ export default function ScoringMethodology() {
               <p className="text-xs font-bold text-white/60 mb-1">On calibration</p>
               <p className="text-xs text-white/35 font-medium leading-relaxed">
                 Record outcomes (Saved / Churned / Expanded) on resolved accounts to activate weight calibration.
-                After 5 outcomes, ChurnRadar will adjust factor weights to reflect which signals actually predicted
+                After 5 outcomes, ProductRadar will adjust factor weights to reflect which signals actually predicted
                 churn in your specific account base — moving from industry averages toward data calibrated on your own retention patterns.
               </p>
             </div>

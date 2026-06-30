@@ -42,8 +42,8 @@ export default function Sidebar() {
     <aside className="fixed left-0 top-0 h-screen w-56 flex flex-col px-4 py-8 bg-black border-r border-white/10 z-30">
       {/* Logo */}
       <div className="flex items-center gap-2.5 px-3 mb-10">
-        <img src="/logo.png" alt="ChurnRadar" className="w-9 h-9" />
-        <span className="text-sm font-extrabold text-white tracking-tight">ChurnRadar</span>
+        <img src="/logo.png" alt="ProductRadar" className="w-9 h-9" />
+        <span className="text-sm font-extrabold text-white tracking-tight">ProductRadar</span>
       </div>
 
       <p className="px-3 mb-3 text-[11px] font-bold uppercase tracking-widest text-white/25">Main</p>

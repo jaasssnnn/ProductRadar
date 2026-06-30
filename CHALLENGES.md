@@ -1,4 +1,4 @@
-# ChurnRadar — Technical Challenges
+# ProductRadar — Technical Challenges
 
 Real problems encountered while building this project, and how they were solved. Written for portfolio context — these represent the kind of decisions and debugging that don't show up in screenshots.
 
