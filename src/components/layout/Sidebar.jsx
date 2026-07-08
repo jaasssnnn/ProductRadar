@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Upload, BarChart2, TrendingUp, Activity, LogOut } from 'lucide-react';
+import { Upload, BarChart2, TrendingUp, Activity, LogOut, RefreshCw, Rocket, DollarSign } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { createClient } from '../../lib/supabase/client';
@@ -28,10 +28,13 @@ export default function Sidebar() {
   }
 
   const navItems = [
-    { to: '/upload',    icon: Upload,    label: 'Upload' },
-    { to: '/dashboard', icon: BarChart2, label: 'Dashboard' },
-    { to: '/insights',  icon: TrendingUp, label: 'Insights' },
-    { to: '/changes',   icon: Activity,  label: 'Changes', badge: escalatedCount },
+    { to: '/upload',     icon: Upload,      label: 'Upload' },
+    { to: '/dashboard',  icon: BarChart2,   label: 'Dashboard' },
+    { to: '/insights',   icon: TrendingUp,  label: 'Insights' },
+    { to: '/changes',    icon: Activity,    label: 'Changes', badge: escalatedCount },
+    { to: '/retention',  icon: RefreshCw,   label: 'Retention' },
+    { to: '/activation', icon: Rocket,      label: 'Activation' },
+    { to: '/cost',       icon: DollarSign,  label: 'Cost' },
   ];
 
   const initials = user?.user_metadata?.full_name
@@ -49,7 +52,7 @@ export default function Sidebar() {
       <p className="px-3 mb-3 text-[11px] font-bold uppercase tracking-widest text-white/25">Main</p>
 
       <nav className="flex flex-col gap-1.5 flex-1">
-        {navItems.map(({ to, icon: Icon, label, badge }) => {
+        {navItems.slice(0, 4).map(({ to, icon: Icon, label, badge }) => {
           const isActive = pathname === to || (to !== '/upload' && pathname.startsWith(to));
           return (
             <Link
@@ -68,6 +71,26 @@ export default function Sidebar() {
                   {badge}
                 </span>
               )}
+            </Link>
+          );
+        })}
+
+        <p className="px-3 mt-5 mb-3 text-[11px] font-bold uppercase tracking-widest text-white/25">Metrics</p>
+
+        {navItems.slice(4).map(({ to, icon: Icon, label }) => {
+          const isActive = pathname === to || pathname.startsWith(to);
+          return (
+            <Link
+              key={to}
+              href={to}
+              className={`flex items-center gap-3 px-4 py-3 rounded-chip text-sm font-semibold transition-all ${
+                isActive
+                  ? 'bg-white/10 text-white'
+                  : 'text-white/40 hover:bg-white/5 hover:text-white/70'
+              }`}
+            >
+              <Icon size={18} strokeWidth={isActive ? 2 : 1.6} />
+              <span className="flex-1">{label}</span>
             </Link>
           );
         })}
