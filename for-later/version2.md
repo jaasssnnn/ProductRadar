@@ -73,9 +73,9 @@ sources added only where needed.
 
 **Data needed:** Customers CSV (with `signup_date`) + Activity CSV. No new CSV type required.
 
-**Still missing from spec:**
-- Explicit churn rate by cohort column (currently implied: churn = 100 − retention, but not surfaced)
-- Rolling retention heatmap by week (currently by month cohort only)
+**Updates:**
+- ✓ Explicit D30 Churn Rate column added to cohort heatmap (100 − D30 retention, shown in red)
+- Rolling retention heatmap by week (currently by month cohort only — not yet done)
 
 ---
 
@@ -133,10 +133,9 @@ For richer activation: add `event_name = "activated"` or `"onboarding_complete"`
 **Data needed:** Customers CSV (MRR). Activity CSV for active user count. Manual CAC input OR
 spend CSV with columns: `spend` / `total_spend`, `new_customers` / `new_signups`.
 
-**Still missing from spec:**
-- Support cost per ticket — needs a per-ticket cost input (no data source for this yet;
-  could add a manual $/ticket field similar to manual CAC, or add a `cost_per_ticket` column
-  to spend CSV)
+**Updates:**
+- ✓ Manual support cost per ticket input added ($/ticket field, shows total support cost = tickets × cost)
+- Support cost per ticket surfaced in summary stats row
 
 ---
 
@@ -206,13 +205,18 @@ spend CSV with columns: `spend` / `total_spend`, `new_customers` / `new_signups`
 
 ---
 
-## Remaining Work in Phase 2 Before Moving to Phase 3
+## Phase 2 Status Summary
 
-1. **Churn rate by cohort** — add a `churnRate` column to the retention heatmap
-   (simple: `100 − retentionPct` per cohort per window)
+| Item | Status |
+|------|--------|
+| Retention page + engine | ✓ Done |
+| Activation page + engine | ✓ Done |
+| Cost page + engine | ✓ Done |
+| Churn rate by cohort (explicit column) | ✓ Done |
+| Support cost per ticket (manual input) | ✓ Done |
+| Sidebar Metrics section | ✓ Done |
 
-2. **Support cost per ticket** — add a manual $/ticket input to the Cost page,
-   multiply by `totalTickets` to get total support cost, show cost/ticket as a KPI card
+**Phase 2 complete. Ready to move to Phase 3.**
 
 ---
 
