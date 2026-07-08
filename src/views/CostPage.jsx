@@ -52,7 +52,7 @@ export default function CostPage() {
     );
   }
 
-  const { totalMRR, totalCustomers, activeUsers, mrrPerActiveUser, mrrPerCustomer, totalTickets, costPerTicket, totalSupportCost, ltv, cac, ltvcac, byPlan, byChannel, avgLifespanMonths } = cost;
+  const { totalMRR, totalCustomers, activeUsers, mrrPerActiveUser, totalTickets, costPerTicket, totalSupportCost, ltv, cac, ltvcac, byPlan, byChannel, avgLifespanMonths } = cost;
 
   const kpis = [
     { label: 'MRR / Active User', value: mrrPerActiveUser !== null ? `$${mrrPerActiveUser.toFixed(0)}` : '—', sub: `${activeUsers} of ${totalCustomers} active`, gradient: 'bg-gradient-to-br from-kpi-blue-from to-kpi-blue-to' },
