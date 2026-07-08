@@ -1,4 +1,4 @@
-export function computeCost(customers, activity, support, manualCAC, spendRows) {
+export function computeCost(customers, activity, support, manualCAC, spendRows, manualCostPerTicket) {
   if (!customers.length) return null;
 
   const totalMRR = customers.reduce((s, c) => s + (parseFloat(c.mrr) || 0), 0);
@@ -13,6 +13,8 @@ export function computeCost(customers, activity, support, manualCAC, spendRows) 
 
   // Support tickets
   const totalTickets = support.reduce((s, r) => s + (parseInt(r.ticket_count) || 0), 0);
+  const costPerTicket = manualCostPerTicket || null;
+  const totalSupportCost = costPerTicket && totalTickets ? costPerTicket * totalTickets : null;
 
   // LTV: ARPU × average lifespan (assumed 24 months when churn rate unknown)
   // If spend data has enough info we could compute churn, otherwise use 24mo default
@@ -58,6 +60,7 @@ export function computeCost(customers, activity, support, manualCAC, spendRows) 
     totalMRR, avgMRR, totalCustomers: customers.length,
     activeUsers, mrrPerActiveUser, mrrPerCustomer,
     totalTickets, totalSpend,
+    costPerTicket, totalSupportCost,
     ltv, avgLifespanMonths,
     cac, derivedCAC, ltvcac,
     byPlan, byChannel,

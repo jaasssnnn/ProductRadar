@@ -10,14 +10,15 @@ import { parseCSV, normalizeHeaders } from '../lib/csvParser';
 export default function CostPage() {
   const { customers, activity, support, dataLoaded } = useApp();
   const router = useRouter();
-  const [manualCAC, setManualCAC]   = useState('');
-  const [spendRows, setSpendRows]   = useState([]);
-  const [spendError, setSpendError] = useState('');
+  const [manualCAC, setManualCAC]             = useState('');
+  const [manualCostPerTicket, setManualCPT]   = useState('');
+  const [spendRows, setSpendRows]             = useState([]);
+  const [spendError, setSpendError]           = useState('');
   const fileRef = useRef();
 
   const cost = useMemo(
-    () => computeCost(customers, activity, support, manualCAC ? parseFloat(manualCAC) : null, spendRows),
-    [customers, activity, support, manualCAC, spendRows]
+    () => computeCost(customers, activity, support, manualCAC ? parseFloat(manualCAC) : null, spendRows, manualCostPerTicket ? parseFloat(manualCostPerTicket) : null),
+    [customers, activity, support, manualCAC, spendRows, manualCostPerTicket]
   );
 
   async function handleSpendFile(e) {
@@ -51,7 +52,7 @@ export default function CostPage() {
     );
   }
 
-  const { totalMRR, totalCustomers, activeUsers, mrrPerActiveUser, mrrPerCustomer, totalTickets, ltv, cac, ltvcac, byPlan, byChannel, avgLifespanMonths } = cost;
+  const { totalMRR, totalCustomers, activeUsers, mrrPerActiveUser, mrrPerCustomer, totalTickets, costPerTicket, totalSupportCost, ltv, cac, ltvcac, byPlan, byChannel, avgLifespanMonths } = cost;
 
   const kpis = [
     { label: 'MRR / Active User', value: mrrPerActiveUser !== null ? `$${mrrPerActiveUser.toFixed(0)}` : '—', sub: `${activeUsers} of ${totalCustomers} active`, gradient: 'bg-gradient-to-br from-kpi-blue-from to-kpi-blue-to' },
@@ -81,8 +82,8 @@ export default function CostPage() {
         ))}
       </div>
 
-      {/* CAC input + spend CSV */}
-      <div className="grid grid-cols-2 gap-4">
+      {/* CAC + support cost inputs + spend CSV */}
+      <div className="grid grid-cols-3 gap-4">
         <div className="bg-[#111] border border-white/[0.08] rounded-card p-6">
           <p className="text-xs font-bold uppercase tracking-widest text-white/40 mb-4">Manual CAC Input</p>
           <p className="text-xs text-white/30 mb-3">Average cost to acquire one new customer (in $)</p>
@@ -99,6 +100,27 @@ export default function CostPage() {
           </div>
           {manualCAC && !isNaN(parseFloat(manualCAC)) && (
             <p className="text-xs text-white/30 mt-3">LTV:CAC = {ltvcac !== null ? `${ltvcac.toFixed(1)}x` : '—'} {ltvcac >= 3 ? '✓ healthy' : ltvcac ? '⚠ below 3x target' : ''}</p>
+          )}
+        </div>
+
+        <div className="bg-[#111] border border-white/[0.08] rounded-card p-6">
+          <p className="text-xs font-bold uppercase tracking-widest text-white/40 mb-4">Support Cost / Ticket</p>
+          <p className="text-xs text-white/30 mb-3">Average cost to resolve one support ticket (in $)</p>
+          <div className="flex items-center gap-3">
+            <span className="text-white/40 text-sm font-semibold">$</span>
+            <input
+              type="number"
+              min="0"
+              placeholder="e.g. 18"
+              value={manualCostPerTicket}
+              onChange={e => setManualCPT(e.target.value)}
+              className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/20 focus:outline-none focus:border-white/30 transition-colors"
+            />
+          </div>
+          {costPerTicket && totalTickets > 0 && (
+            <p className="text-xs text-white/30 mt-3">
+              Total support cost: ${totalSupportCost?.toLocaleString()} across {totalTickets} tickets
+            </p>
           )}
         </div>
 
@@ -123,10 +145,10 @@ export default function CostPage() {
       {/* Summary stats */}
       <div className="grid grid-cols-4 gap-4">
         {[
-          { label: 'Total MRR',       value: `$${Math.round(totalMRR).toLocaleString()}` },
-          { label: 'Total Customers', value: totalCustomers },
-          { label: 'Active Users',    value: activeUsers },
-          { label: 'Total Tickets',   value: totalTickets },
+          { label: 'Total MRR',          value: `$${Math.round(totalMRR).toLocaleString()}` },
+          { label: 'Total Customers',    value: totalCustomers },
+          { label: 'Active Users',       value: activeUsers },
+          { label: 'Support Cost / Ticket', value: costPerTicket ? `$${costPerTicket}` : '—' },
         ].map(s => (
           <div key={s.label} className="bg-[#111] border border-white/[0.08] rounded-card p-5 text-center">
             <p className="text-2xl font-extrabold text-white">{s.value}</p>

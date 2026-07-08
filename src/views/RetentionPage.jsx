@@ -118,26 +118,35 @@ export default function RetentionPage() {
               {RETENTION_WINDOWS.map(d => (
                 <th key={d} className="text-center text-xs text-white/40 font-bold uppercase tracking-wider pb-3 px-3">D{d}</th>
               ))}
+              <th className="text-center text-xs text-white/40 font-bold uppercase tracking-wider pb-3 px-3">D30 Churn</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/[0.05]">
-            {cohortData.map(cohort => (
-              <tr key={cohort.month}>
-                <td className="py-3 pr-6 text-white font-semibold">{cohort.month}</td>
-                <td className="py-3 px-3 text-center text-white/40">{cohort.size}</td>
-                {RETENTION_WINDOWS.map(d => {
-                  const pct = cohort.pct[`day${d}`];
-                  const { bg, text } = heatColor(pct);
-                  return (
-                    <td key={d} className="py-3 px-3 text-center">
-                      <span className="inline-block px-2.5 py-1 rounded-lg text-xs font-bold" style={{ background: bg, color: text }}>
-                        {pct.toFixed(0)}%
-                      </span>
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
+            {cohortData.map(cohort => {
+              const churnRate = 100 - cohort.pct['day30'];
+              return (
+                <tr key={cohort.month}>
+                  <td className="py-3 pr-6 text-white font-semibold">{cohort.month}</td>
+                  <td className="py-3 px-3 text-center text-white/40">{cohort.size}</td>
+                  {RETENTION_WINDOWS.map(d => {
+                    const pct = cohort.pct[`day${d}`];
+                    const { bg, text } = heatColor(pct);
+                    return (
+                      <td key={d} className="py-3 px-3 text-center">
+                        <span className="inline-block px-2.5 py-1 rounded-lg text-xs font-bold" style={{ background: bg, color: text }}>
+                          {pct.toFixed(0)}%
+                        </span>
+                      </td>
+                    );
+                  })}
+                  <td className="py-3 px-3 text-center">
+                    <span className="inline-block px-2.5 py-1 rounded-lg text-xs font-bold" style={{ background: heatColor(100 - churnRate).bg, color: '#E5484D' }}>
+                      {churnRate.toFixed(0)}%
+                    </span>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
