@@ -107,6 +107,145 @@ Please respond with ONLY a JSON object (no markdown, no preamble) in this exact 
   }
 }
 
+export async function getWeeklyDigest(scoredAccounts, changedAccounts) {
+  const atRisk    = scoredAccounts.filter(a => a.score >= 50);
+  const critical  = scoredAccounts.filter(a => a.label === 'Critical');
+  const mrrAtRisk = Math.round(scoredAccounts.reduce((s, a) => s + parseFloat(a.mrr || 0) * (a.score / 100), 0));
+  const escalated = changedAccounts.filter(a => a.changeType === 'escalated');
+  const improved  = changedAccounts.filter(a => a.changeType === 'improved');
+
+  const topRisk = scoredAccounts
+    .filter(a => a.score >= 50)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 5)
+    .map(a => `- ${a.account_name} (${a.label}, score ${a.score}, $${a.mrr} MRR): ${(a.factors || []).map(f => f.label).join(', ')}`)
+    .join('\n');
+
+  const prompt = `You are a SaaS customer success analyst writing a Monday morning portfolio digest for the CS team.
+
+Current portfolio:
+- Total accounts: ${scoredAccounts.length}
+- At Risk (score ≥50): ${atRisk.length}
+- Critical (score ≥75): ${critical.length}
+- Weighted MRR at Risk: $${mrrAtRisk.toLocaleString()}
+- Escalated since last run: ${escalated.length} accounts
+- Improved since last run: ${improved.length} accounts
+
+Top at-risk accounts:
+${topRisk || 'None'}
+
+Write a concise weekly digest. Respond ONLY with this JSON (no markdown):
+{
+  "headline": "One sentence summary of overall portfolio health this week",
+  "improved": "1-2 sentences on what improved or looks healthy (or null if nothing notable)",
+  "deteriorated": "1-2 sentences on what worsened or needs attention (or null if nothing notable)",
+  "actions": ["action 1 the team should take this week", "action 2", "action 3"]
+}`;
+
+  const text = await callGroq(prompt);
+  try {
+    return JSON.parse(text.replace(/```json|```/g, '').trim());
+  } catch {
+    return { headline: text, improved: null, deteriorated: null, actions: [] };
+  }
+}
+
+export async function getAnomalyInsight(anomalies, scoredAccounts) {
+  const criticalAccounts = scoredAccounts
+    .filter(a => a.label === 'Critical')
+    .map(a => a.account_name)
+    .join(', ');
+
+  const prompt = `You are a SaaS retention analyst. The following anomalies were detected after the latest analysis run:
+
+${anomalies.join('\n')}
+
+Critical accounts right now: ${criticalAccounts || 'none'}
+
+Write ONE clear, specific alert sentence for the CS team about the most important anomaly.
+Be specific — name numbers and accounts where possible.
+Respond ONLY with a JSON object (no markdown):
+{
+  "alert": "The specific alert sentence",
+  "severity": "high | medium"
+}`;
+
+  const text = await callGroq(prompt);
+  try {
+    return JSON.parse(text.replace(/```json|```/g, '').trim());
+  } catch {
+    return { alert: anomalies[0], severity: 'medium' };
+  }
+}
+
+export async function getConversationalAnswer(question, dataContext) {
+  const { scoredAccounts, retentionSummary, activationSummary, costSummary } = dataContext;
+
+  const accountSummary = scoredAccounts
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 20)
+    .map(a => `${a.account_name} | ${a.plan} | $${a.mrr} MRR | Score: ${a.score} (${a.label}) | Factors: ${(a.factors || []).map(f => f.label).join(', ')}`)
+    .join('\n');
+
+  const prompt = `You are a SaaS analytics assistant. Answer the user's question using the portfolio data below.
+
+ACCOUNTS (top 20 by risk score):
+${accountSummary}
+
+${retentionSummary ? `RETENTION:\n${retentionSummary}\n` : ''}
+${activationSummary ? `ACTIVATION:\n${activationSummary}\n` : ''}
+${costSummary ? `COST:\n${costSummary}\n` : ''}
+
+USER QUESTION: "${question}"
+
+Respond ONLY with this JSON (no markdown):
+{
+  "answer": "Clear, specific answer to the question (2-4 sentences, cite numbers)",
+  "chartData": [{"name": "label", "value": 42}] or null,
+  "chartTitle": "Chart title" or null
+}
+Note: only include chartData if a bar chart would meaningfully illustrate the answer.`;
+
+  const text = await callGroq(prompt);
+  try {
+    return JSON.parse(text.replace(/```json|```/g, '').trim());
+  } catch {
+    return { answer: text, chartData: null, chartTitle: null };
+  }
+}
+
+export async function getRootCauseHypothesis(metric, currentVal, previousVal, topAccounts) {
+  const drop = (previousVal - currentVal).toFixed(1);
+  const accountList = topAccounts
+    .slice(0, 5)
+    .map(a => `- ${a.account_name}: score ${a.score}, factors: ${(a.factors || []).map(f => f.label).join(', ')}`)
+    .join('\n');
+
+  const prompt = `You are a SaaS analyst. A key metric dropped between analysis runs.
+
+Metric: ${metric}
+Previous value: ${previousVal.toFixed(1)}%
+Current value: ${currentVal.toFixed(1)}%
+Drop: ${drop} percentage points
+
+Highest-risk accounts right now:
+${accountList || 'None available'}
+
+Hypothesize why this metric dropped. Be specific and actionable.
+Respond ONLY with this JSON (no markdown):
+{
+  "hypothesis": "2-3 sentence hypothesis on why the metric dropped and what might be causing it",
+  "recommendation": "One specific action to investigate or address this"
+}`;
+
+  const text = await callGroq(prompt);
+  try {
+    return JSON.parse(text.replace(/```json|```/g, '').trim());
+  } catch {
+    return { hypothesis: text, recommendation: 'Review the accounts listed above.' };
+  }
+}
+
 export async function getInsightsSummary(accountsWithScores) {
   if (USE_MOCK) {
     await new Promise(r => setTimeout(r, 1500));

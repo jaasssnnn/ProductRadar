@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { useApp } from '../context/AppContext';
 import { computeRetention, RETENTION_WINDOWS } from '../lib/retention';
+import RootCausePanel from '../components/shared/RootCausePanel';
 
 const COHORT_COLORS = ['#8E7CF0', '#4070E0', '#16A36B', '#C98A1E', '#E5484D', '#EA7A19', '#6B93F0', '#A78BFA'];
 
@@ -63,6 +64,15 @@ export default function RetentionPage() {
           </div>
         ))}
       </div>
+
+      {/* Root cause panel — appears if Day-30 retention dropped 5+ points since last run */}
+      <RootCausePanel
+        metricName="Day-30 Retention"
+        currentVal={avgDay30}
+        prevKey="cr_prev_retention_day30"
+        threshold={5}
+        topAccounts={[]}
+      />
 
       {/* Retention curve */}
       <div className="bg-[#111] border border-white/[0.08] rounded-card p-6">

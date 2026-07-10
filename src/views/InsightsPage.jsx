@@ -1,11 +1,15 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2, Sparkles, GitBranch, Zap } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import InsightCard from '../components/insights/InsightCard';
 import SegmentChart from '../components/insights/SegmentChart';
+import AIQueryPanel from '../components/insights/AIQueryPanel';
 import { getInsightsSummary } from '../lib/claudeApi';
+import { computeRetention } from '../lib/retention';
+import { computeActivation } from '../lib/activation';
+import { computeCost } from '../lib/cost';
 import { BASE_WEIGHTS } from '../lib/scoring';
 import { FACTOR_SHORT } from '../lib/clustering';
 import { getRiskLabel } from '../lib/scoring';
@@ -98,11 +102,15 @@ function ClusterCard({ cluster }) {
 }
 
 export default function InsightsPage() {
-  const { scoredAccounts, dataLoaded, accountStatuses, outcomes, clusters, learnedWeights, learnedWeightsMeta } = useApp();
+  const { scoredAccounts, dataLoaded, accountStatuses, outcomes, clusters, learnedWeights, learnedWeightsMeta, activity, customers, billing, support } = useApp();
   const router = useRouter();
   const [insights, setInsights] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState(null);
+
+  const retentionData  = useMemo(() => computeRetention(customers, activity),          [customers, activity]);
+  const activationData = useMemo(() => computeActivation(customers, activity),         [customers, activity]);
+  const costData       = useMemo(() => computeCost(customers, activity, support, null, []), [customers, activity, support]);
 
   async function loadInsights() {
     setLoading(true); setError(null);
@@ -342,6 +350,14 @@ export default function InsightsPage() {
         <SegmentChart data={riskLevelData} dataKey="count" nameKey="label" title="Accounts by Risk Level" unit=" accts" />
         <SegmentChart data={planData}      dataKey="mrr"   nameKey="plan"  title="MRR at Risk by Plan" />
       </div>
+
+      {/* Conversational AI query */}
+      <AIQueryPanel
+        scoredAccounts={scoredAccounts}
+        retentionData={retentionData}
+        activationData={activationData}
+        costData={costData}
+      />
     </div>
   );
 }

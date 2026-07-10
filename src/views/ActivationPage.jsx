@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { useApp } from '../context/AppContext';
 import { computeActivation } from '../lib/activation';
+import RootCausePanel from '../components/shared/RootCausePanel';
 
 export default function ActivationPage() {
   const { customers, activity, dataLoaded } = useApp();
@@ -53,6 +54,15 @@ export default function ActivationPage() {
           </p>
         )}
       </div>
+
+      {/* Root cause panel — appears if 7-day activation rate dropped 10+ points since last run */}
+      <RootCausePanel
+        metricName="7-Day Activation Rate"
+        currentVal={activationRate7}
+        prevKey="cr_prev_activation_rate7"
+        threshold={10}
+        topAccounts={activation.metrics?.filter(m => !m.activatedWithin7).slice(0, 5) || []}
+      />
 
       {/* KPI cards */}
       <div className="grid grid-cols-3 gap-4">

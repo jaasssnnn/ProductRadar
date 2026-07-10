@@ -6,6 +6,8 @@ import MetricCard from '../components/dashboard/MetricCard';
 import RiskTable from '../components/dashboard/RiskTable';
 import SegmentChart from '../components/insights/SegmentChart';
 import ScoringMethodology from '../components/dashboard/ScoringMethodology';
+import WeeklyDigest from '../components/dashboard/WeeklyDigest';
+import AnomalyBanner from '../components/dashboard/AnomalyBanner';
 
 const FACTOR_LABELS = {
   inactivity:    'No recent activity',
@@ -90,6 +92,12 @@ export default function DashboardPage() {
           </p>
         )}
       </div>
+
+      {/* Weekly digest */}
+      <WeeklyDigest scoredAccounts={scoredAccounts} changedAccounts={changedAccounts} />
+
+      {/* Anomaly banner */}
+      <AnomalyBanner scoredAccounts={scoredAccounts} />
 
       {/* Confidence banner */}
       {missingTypes.length > 0 && (
