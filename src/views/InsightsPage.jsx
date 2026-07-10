@@ -102,7 +102,7 @@ function ClusterCard({ cluster }) {
 }
 
 export default function InsightsPage() {
-  const { scoredAccounts, dataLoaded, accountStatuses, outcomes, clusters, learnedWeights, learnedWeightsMeta, activity, customers, billing, support } = useApp();
+  const { scoredAccounts, dataLoaded, accountStatuses, outcomes, clusters, learnedWeights, learnedWeightsMeta, activity, customers, support } = useApp();
   const router = useRouter();
   const [insights, setInsights] = useState(null);
   const [loading, setLoading] = useState(false);

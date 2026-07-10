@@ -4,7 +4,7 @@ import { Sparkles, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { getRootCauseHypothesis } from '../../lib/claudeApi';
 
 function lsGet(k) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch { return null; } }
-function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (_) { /* storage unavailable */ } }
 
 export default function RootCausePanel({ metricName, currentVal, prevKey, threshold = 5, topAccounts = [] }) {
   const [result,   setResult]   = useState(null);
