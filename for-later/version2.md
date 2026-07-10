@@ -178,37 +178,46 @@ Scoring, retention, and activation engines consume them identically — no downs
 
 ## Phase 4 — AI as Primary Interface
 
-**Status: Not started**
+**Status: ✓ Complete**
 
 **Goal:** Shift AI from on-demand (per-account intervention panel) to proactive and conversational.
 
-**Planned features:**
+### 4A — Weekly Digest ✓
+- `src/components/dashboard/WeeklyDigest.jsx`
+- Generated once per ISO week on first Dashboard visit, cached in localStorage (`cr_weekly_digest`, `cr_weekly_digest_week`)
+- Calls `getWeeklyDigest()` in claudeApi.js with portfolio summary + top at-risk accounts
+- Returns: headline, what improved, what deteriorated, 3 action items
+- Collapsible card at top of Dashboard, above confidence banner
 
-### 4A — Proactive Weekly Digest
-- Every Monday, AI generates a portfolio summary: what improved, what deteriorated, what needs
-  action this week
-- Pushed to the Dashboard as a persistent card (above the KPI cards)
-- Uses Groq to analyze the latest scored accounts and compare to previous snapshot
-- Triggered by a scheduled cron job or on first Dashboard visit each week
+### 4B — Anomaly Push ✓
+- `src/components/dashboard/AnomalyBanner.jsx`
+- Runs on every Dashboard load with new scored accounts
+- Detects: critical count +2, at-risk accounts +3, MRR at risk +20% vs previous run
+- Previous metrics stored in localStorage (`cr_prev_metrics`), updated after each check
+- If anomaly found: calls `getAnomalyInsight()` for a specific Groq-written alert sentence
+- Dismissible banner (dismissed state stored in localStorage keyed by anomaly fingerprint)
 
-### 4B — Anomaly Push
-- After every analysis run, AI scans for significant metric changes across all four modules
-  (churn risk, activation, retention, cost)
-- Surfaces unprompted alerts: "Activation dropped 23% for Enterprise accounts this week"
-- Shown as a dismissible banner or notification panel on the Dashboard
+### 4C — Conversational Query ✓
+- `src/components/insights/AIQueryPanel.jsx` — added to bottom of Insights page
+- Natural language input + Enter/send button
+- 4 example question chips (clickable)
+- Sends question + data context (top 20 accounts, retention/activation/cost summaries) to `getConversationalAnswer()`
+- Returns answer text + optional bar chart data
+- Renders answer inline with Recharts bar chart if chart data is present
 
-### 4C — Conversational Query
-- Natural language input bar (on Insights or a dedicated AI page):
-  "Which cohort has the worst 30-day retention?"
-  "Show me accounts with billing issues and declining usage"
-- AI queries the in-memory data and returns an answer + relevant chart
-- Powered by Groq function calling or structured prompt with JSON output
+### 4D — Root Cause Panel ✓
+- `src/components/shared/RootCausePanel.jsx` — reusable component
+- Stores current metric value in localStorage on each page load, compares to previous
+- Triggers when: Day-30 Retention drops ≥5 points, or 7-Day Activation Rate drops ≥10 points
+- Calls `getRootCauseHypothesis()` with metric name, before/after values, top affected accounts
+- Returns hypothesis (2-3 sentences) + recommended action
+- Placed on Retention page (Day-30 trigger) and Activation page (7-day rate trigger)
 
-### 4D — Root Cause Panel
-- When a metric drops between runs, AI hypothesizes why based on correlated signals:
-  "Activation fell from 68% to 41% — 6 accounts in the March cohort had no feature_use events
-  in their first 7 days, coinciding with a spike in support tickets for the onboarding flow"
-- Shown on the Retention and Activation pages when a decline is detected vs previous snapshot
+### New Groq functions added to claudeApi.js
+- `getWeeklyDigest(scoredAccounts, changedAccounts)`
+- `getAnomalyInsight(anomalies, scoredAccounts)`
+- `getConversationalAnswer(question, dataContext)`
+- `getRootCauseHypothesis(metricName, currentVal, previousVal, topAccounts)`
 
 ---
 
