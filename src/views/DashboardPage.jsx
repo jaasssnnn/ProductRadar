@@ -84,7 +84,7 @@ export default function DashboardPage() {
       <div className="mb-2 flex items-start justify-between">
         <div>
           <h2 className="text-3xl font-extrabold text-white tracking-tight">Dashboard</h2>
-          <p className="text-sm text-white/40 font-medium mt-1">Churn risk overview across all accounts</p>
+          <p className="text-sm text-white/40 font-medium mt-1">Risk overview across all accounts</p>
         </div>
         {lastSynced && (
           <p className="text-sm text-white/70 font-medium mt-1.5">
