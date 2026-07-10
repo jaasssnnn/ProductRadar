@@ -39,6 +39,7 @@ export default {
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
+        hero: ['"Nimbus Sans TW01"', '"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif'],
       },
       borderRadius: {
         card: '24px',
