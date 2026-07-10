@@ -152,20 +152,27 @@ spend CSV with columns: `spend` / `total_spend`, `new_customers` / `new_signups`
 
 ## Phase 3 — Mixpanel Integration
 
-**Status: Not started**
+**Status: ✓ Complete**
 
 **Goal:** Pull event data directly from Mixpanel so users don't need to export/upload activity CSVs manually.
 
-**Planned work:**
-- New server-side API route: `app/api/mixpanel/sync/route.js`
-  - Accepts Mixpanel project token + API secret (stored as env vars or user-entered)
-  - Calls Mixpanel Data Export API to pull raw events for a date range
-  - Maps events to the existing activity CSV shape: `{ customer_id, event_name, timestamp, count }`
-  - Feeds into existing scoring engine and new retention/activation engines
-- UI: new Mixpanel sync panel on the Upload page (alongside the existing Stripe sync panel)
-- Env vars needed: `MIXPANEL_PROJECT_TOKEN`, `MIXPANEL_API_SECRET`
+**What was built:**
+- `app/api/mixpanel/sync/route.js` — server-side POST route
+  - Accepts `{ apiSecret, fromDate, toDate }` from the client
+  - Calls Mixpanel Data Export API (`https://data.mixpanel.com/api/2.0/export/`)
+  - Auth: Basic auth with API secret — credentials never stored, used once per request
+  - Parses NDJSON response (one event per line)
+  - Maps to activity CSV shape: `{ customer_id, event_name, timestamp, count }`
+  - Aggregates by customer_id + event_name + date, counts occurrences
+  - Uses `$user_id` or `distinct_id` as `customer_id`
+- `src/components/upload/MixpanelConnect.jsx` — collapsible panel on Upload page
+  - API secret input (password field), date range picker (defaults last 30 days)
+  - On success: activity rows merged into Upload state, replaces existing activity slot
+  - Shows last sync summary after successful pull
+- No env vars needed — credentials entered per-sync, not stored
 
-**Why it matters:** Makes the product self-serve for teams already on Mixpanel — no CSV exports needed.
+**How it feeds existing engines:** Mixpanel events land in the same activity slot as a CSV upload.
+Scoring, retention, and activation engines consume them identically — no downstream changes needed.
 
 ---
 
