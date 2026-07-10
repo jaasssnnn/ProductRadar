@@ -26,7 +26,13 @@ export async function middleware(request) {
       }
     );
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const timeout = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('supabase_timeout')), 1500)
+    );
+    const { data: { user } } = await Promise.race([
+      supabase.auth.getUser(),
+      timeout,
+    ]);
 
     if (!user && !isPublic) {
       const url = request.nextUrl.clone();
@@ -34,6 +40,7 @@ export async function middleware(request) {
       return NextResponse.redirect(url);
     }
   } catch (e) {
+    // On timeout or Supabase error, redirect to login for protected routes
     if (!isPublic) {
       const url = request.nextUrl.clone();
       url.pathname = '/login';
