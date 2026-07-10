@@ -7,6 +7,7 @@ import { parseCSV, normalizeHeaders, detectFileType, fetchSampleCSV } from '../l
 import { scoreAccount } from '../lib/scoring';
 import { useApp } from '../context/AppContext';
 import StripeConnect from '../components/upload/StripeConnect';
+import MixpanelConnect from '../components/upload/MixpanelConnect';
 import dynamic from 'next/dynamic';
 const CanvasBackground = dynamic(() => import('../components/ui/CanvasBackground'), { ssr: false });
 
@@ -16,6 +17,7 @@ const TYPE_LABELS = {
   billing:   'Billing',
   support:   'Support',
   unknown:   'Unknown',
+  mixpanel:  'Mixpanel',
 };
 
 function runScoring(accountRows, activity, billing, support, weights) {
@@ -123,6 +125,14 @@ export default function UploadPage() {
     finally { setLoading(false); }
   }
 
+  function handleMixpanelSyncComplete(activityRows) {
+    const merged = [...activityRows];
+    setUploadedFiles(prev => {
+      const without = prev.filter(f => f.type !== 'activity');
+      return [...without, { name: 'mixpanel-events.csv', type: 'activity', rows: merged }];
+    });
+  }
+
   async function handleStripeSyncComplete(stripeData) {
     setLoading(true); setError(null);
     try {
@@ -166,6 +176,10 @@ export default function UploadPage() {
 
           {/* Stripe Connect */}
           <StripeConnect onSyncComplete={handleStripeSyncComplete} />
+
+          <div className="mt-3">
+            <MixpanelConnect onSyncComplete={handleMixpanelSyncComplete} />
+          </div>
 
           <div className="flex items-center gap-3 my-5">
             <div className="flex-1 h-px bg-white/10" />
