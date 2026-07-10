@@ -8,8 +8,6 @@ import { scoreAccount } from '../lib/scoring';
 import { useApp } from '../context/AppContext';
 import StripeConnect from '../components/upload/StripeConnect';
 import MixpanelConnect from '../components/upload/MixpanelConnect';
-import dynamic from 'next/dynamic';
-const CanvasBackground = dynamic(() => import('../components/ui/CanvasBackground'), { ssr: false });
 
 const TYPE_LABELS = {
   customers: 'Customers',
@@ -148,8 +146,17 @@ export default function UploadPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black relative flex items-center justify-center px-6 py-16">
-      <CanvasBackground />
+    <div
+      className="min-h-screen relative flex items-center justify-center px-6 py-16 bg-cover bg-center overflow-hidden"
+      style={{ backgroundImage: 'url(/landing/hero-bg.webp)' }}
+    >
+      {/* Grass overlay */}
+      <img
+        src="/landing/grass.png"
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-0 left-0 z-0 w-full select-none"
+      />
 
       <motion.div
         initial={{ opacity: 0, y: 24 }}
@@ -160,11 +167,11 @@ export default function UploadPage() {
         {/* Logo */}
         <div className="flex items-center justify-center gap-3 mb-8">
           <img src="/logo.png" alt="ProductRadar" className="w-10 h-10" />
-          <span className="text-white font-bold text-lg tracking-tight">ProductRadar</span>
+          <span className="text-gray-900 font-bold text-lg tracking-tight">ProductRadar</span>
         </div>
 
         {/* Card */}
-        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-[28px] p-8">
+        <div className="bg-[#111117]/90 backdrop-blur-xl border border-white/10 rounded-[28px] p-8 shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
 
           {/* Header */}
           <div className="text-center mb-7">
